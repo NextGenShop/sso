@@ -28,7 +28,7 @@ To run the scripts, first configure the required environment variables according
     export KEYCLOAK_HOST=[hostname of your machine (needed for TLS certificate retrieval)] # www. can be omitted
 
     export ARCHITECTURE=[amd64 | arm64 | armhf]
-    export DISTRIBUTION=[uubntu | debian | raspbian]
+    export DISTRIBUTION=[ubuntu | debian | raspbian]
 
 then run
 
