@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  keycloak:
+    image: jboss/keycloak:latest
+    environment:
+      - PROXY_ADDRESS_FORWARDING=true
+      - KEYCLOAK_USER=${KEYCLOAK_USER}         # admin username
+      - KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD} # admin password
+
+  reverse_proxy:
+    image: nginx:1.19.6-alpine
+    environment:
+      - NGINX_HOST=${KEYCLOAK_HOST}
+      - NGINX_PORT=80
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - keycloak
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'envsubst; while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'; "
