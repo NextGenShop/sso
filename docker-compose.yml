@@ -9,10 +9,15 @@ services:
 
   keycloak:
     image: jboss/keycloak:latest
+    volumes:
+      - ./realm/nextgenshop_realm.json:/tmp/nextgenshop_realm.json
+      - ./data:/opt/jboss/keycloak/standalone/data
     environment:
       - PROXY_ADDRESS_FORWARDING=true
       - KEYCLOAK_USER=${KEYCLOAK_USER}         # admin username
       - KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD} # admin password
+      - KEYCLOAK_IMPORT=/tmp/nextgenshop_realm.json
+      - DB_VENDOR=h2
 
   reverse_proxy:
     image: nginx:1.19.6-alpine
